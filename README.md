@@ -20,18 +20,18 @@ Yejin Kim and Dohyek Lee
 
 ### 2. Run in Simulation
 #### 2.1. Installation
-`code`
+```
     virtualenv venv -p python3.8
     pip install torch==1.13.1+cu117
     pip install git+https://github.com/openai/CLIP.git
     mv CLIP CLIP_
-`code`
+```
 
 #### 2.2 Train Brush Strokes Renderer
 #### 2.3 Train ARTE Sketcher
-`code`
-    python train.py --loss_fcn clip
-`code`
+```
+    python train.py --loss_fcn clip 
+```
 #### 2.4 Paint by Inferences
 
 

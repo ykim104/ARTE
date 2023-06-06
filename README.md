@@ -35,7 +35,7 @@ Yejin Kim and Dohyek Lee
 2. *Content Masked Loss [https://github.com/pschaldenbrand/ContentMaskedLoss]
 3. *CLIPPasso [https://github.com/yael-vinker/CLIPasso]
 4. **FRIDA [https://github.com/cmubig/Frida/tree/master]
-* *Heavily influenced Sim*
+* *Heavily influenced Sim*\n
 ** *Heavily influenced the robot code*
 
 ### Acknowledgements

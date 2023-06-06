@@ -23,6 +23,8 @@ Yejin Kim and Dohyek Lee
 `code`
     virtualenv venv -p python3.8
     pip install torch==1.13.1+cu117
+    pip install git+https://github.com/openai/CLIP.git
+    mv CLIP CLIP_
 `code`
 
 #### 2.2 Train Brush Strokes Renderer

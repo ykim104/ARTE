@@ -1,4 +1,4 @@
-# ARTE 
+# ARTE : ARTificial Expressions
 
 Yejin Kim and Dohyek Lee
 <br />Sponsored by ZER01NE<br />

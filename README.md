@@ -3,6 +3,11 @@
 Yejin Kim and Dohyek Lee
 **Sponsored by ZER01NE**
 
+### TASK LIST
+-[ ]
+-[ ]
+
+
 ### 1. Introduction
 #### 1.1  ARTE Skecher: Reinforcement Learning
 #### 1.2. ARTE SKetcher: Objectives
@@ -15,8 +20,16 @@ Yejin Kim and Dohyek Lee
 
 ### 2. Run in Simulation
 #### 2.1. Installation
+`code`
+    virtualenv venv -p python3.8
+    pip install torch==1.13.1+cu117
+`code`
+
 #### 2.2 Train Brush Strokes Renderer
 #### 2.3 Train ARTE Sketcher
+`code`
+    python train.py --loss_fcn clip
+`code`
 #### 2.4 Paint by Inferences
 
 

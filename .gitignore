@@ -1,3 +1,14 @@
+# Data
+data/
+models/DRL
+train_log_deleteme/
+
+
+# CLIP
+#CLIP_/
+
+
+# ROS TEMPLATE
 devel/
 logs/
 build/

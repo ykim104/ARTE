@@ -34,6 +34,13 @@ Yejin Kim and Dohyek Lee
 ```
     python train.py --loss_fcn clip 
 ```
+
+To monitor the training progress,
+```
+    tensorboard --logdir train_log_deleteme/
+```
+
+
 #### 2.4 Paint by Inferences
 
 

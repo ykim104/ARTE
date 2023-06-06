@@ -4,8 +4,8 @@ Yejin Kim and Dohyek Lee
 <br />Sponsored by ZER01NE<br />
 
 ### TASK LIST
-- [ ] train actors and critics using a CLIP based loss functions using a target image
-- [ ] train actors and critics using a CLIP based loss functions using a target text
+- [ ] train actors and critics using CLIP based loss functions using a target image
+- [ ] train actors and critics using CLIP based loss functions using a target text
 - [ ] inference; stroke based rendering and painting using a real robot
 
 

@@ -1,7 +1,7 @@
 # ARTE 
 
 Yejin Kim and Dohyek Lee
-**Sponsored by ZER01NE**
+<br />Sponsored by ZER01NE<br />
 
 ### 1. Introduction
 #### 1.1  ARTE Skecher: Reinforcement Learning
@@ -34,9 +34,9 @@ Yejin Kim and Dohyek Lee
 1. Learning to Paint [https://github.com/megvii-research/ICCV2019-LearningToPaint]
 2. *Content Masked Loss [https://github.com/pschaldenbrand/ContentMaskedLoss]
 3. *CLIPPasso [https://github.com/yael-vinker/CLIPasso]
-4. **FRIDA [https://github.com/cmubig/Frida/tree/master]
-* *Heavily influenced Sim*\n
-** *Heavily influenced the robot code*
+4. **FRIDA [https://github.com/cmubig/Frida/tree/master]<br />
+**Heavily influenced Sim* <br />
+***Heavily influenced the robot code*
 
 ### Acknowledgements
 ZER01NE

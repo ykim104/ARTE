@@ -334,6 +334,18 @@ class DDPG(object):
             action[i] = action[i] + np.random.normal(0, self.noise_level[i], action.shape[1:]).astype('float32')
         return np.clip(action.astype('float32'), 0, 1)
     
+    def set_action(self, state, action):
+        self.action = action 
+        
+        #canvas = state[:, :3].float() / 255
+        #new_observation = decode(action.to("cuda:0"), canvas.to("cuda:0"), brush_color=self.opt.brush_color) 
+        #cv2.imshow("updated image",new_observation[0].cpu().detach().numpy().transpose(1, 2, 0))
+        
+        #cv2.waitKey(1)
+        #if k==27:
+        #    cv2.destroyWindow("updated image")
+            
+
     def select_action(self, state, return_fix=False, noise_factor=0):
         self.eval()
         with torch.no_grad():

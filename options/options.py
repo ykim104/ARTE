@@ -24,11 +24,11 @@ class Options():
         parser.add_argument('--feedback_max', default=1000, type=int, help='max length for feedback')
         
         # basic parameters
-        parser.add_argument('--warmup', default=0, type=int, help='timestep without training but only filling the replay memory')
+        parser.add_argument('--warmup', default=400, type=int, help='timestep without training but only filling the replay memory')
         parser.add_argument('--discount', default=0.95, type=float, help='discount factor')
-        parser.add_argument('--batch_size', default=8, type=int, help='minibatch size')
+        parser.add_argument('--batch_size', default=1, type=int, help='minibatch size')
         parser.add_argument('--rmsize', default=400, type=int, help='replay memory size')
-        parser.add_argument('--env_batch', default=2, type=int, help='concurrent environment number')
+        parser.add_argument('--env_batch', default=1, type=int, help='concurrent environment number')
         parser.add_argument('--tau', default=0.001, type=float, help='moving average for target network')
         parser.add_argument('--max_step', default=5, type=int, help='max length for episode')
         parser.add_argument('--noise_factor', default=0.0, type=float, help='noise level for parameter space noise')

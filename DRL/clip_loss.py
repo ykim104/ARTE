@@ -83,7 +83,7 @@ def get_clip_conv_loss(canvas, target, mode="train"):
     # Geometric Loss: L2 distance between intermediate level activations of CLIP
     conv_loss = distance_metrics(xs_conv_features,ys_conv_features)
 
-    conv_loss_weights = [0,0,1.0,1.0,0]
+    conv_loss_weights = [0.8, 0.8, 1.0, 1.0, 0.8]
     for i in range(len(conv_loss)):
         conv_loss[i]*=conv_loss_weights[i]
     #print("conv_loss: ", sum(conv_loss))
@@ -93,10 +93,10 @@ def get_clip_conv_loss(canvas, target, mode="train"):
     fc_loss = [1 - torch.cosine_similarity(xs_fc_features,
                     ys_fc_features, dim=1)]
     for i in range(len(fc_loss)):
-        fc_loss[i]*=1.0 #0.1 #.mean()
-    #print("fc loss: ", fc_loss)
+        fc_loss[i]*=0.5 #0.1 #.mean()
+    #print("fc loss: ", sum(fc_loss))
 
-    return fc_loss[0] + 0.5*conv_loss[0]
+    return sum(fc_loss) + sum(conv_loss) #conv_loss[0]
 
 
 def forward_inspection_clip_resnet(x):

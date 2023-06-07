@@ -503,7 +503,7 @@ class Paint:
         if self.use_multiple_renderers:
             self.canvas = (decode_multiple_renderers(action, self.canvas.float() / 255, episode_num) * 255).byte()
         else:
-            self.canvas = (decode(action, self.canvas.float() / 255) * 255).byte()
+            self.canvas = (decode(action, self.canvas.float() / 255, self.opt.brush_color) * 255).byte()
         self.stepnum += 1
         ob, mask = self.observation()
         done = (self.stepnum == self.max_step)

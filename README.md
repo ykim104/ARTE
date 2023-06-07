@@ -24,7 +24,7 @@ Yejin Kim and Dohyek Lee
 #### 2.1. Installation
 ```
     virtualenv venv -p python3.8
-    pip install torch==1.13.1+cu117
+    pip install torch==1.13.1+cu117 scipy==1.5
     pip install git+https://github.com/openai/CLIP.git
     mv CLIP CLIP_
 ```

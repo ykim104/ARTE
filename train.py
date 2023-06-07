@@ -10,6 +10,7 @@ import time
 import datetime
 from options.options import Options
 from DRL.feedback import HumanFeedback
+from DRL.init_stroke import SaliencyMap
 #import tqdm
 from tqdm import tqdm
 
@@ -58,11 +59,45 @@ def train(agent, env, evaluate):
                 print('loading a new file')
                 imgs_used_from_file = 0
 
-        #prev_observation = agent.state
-        action = agent.select_action(observation, noise_factor=noise_factor) # updates agent.action
-        #print("Action Shape:", action.shape)
-        #observation, reward, done, _, mask = env.step(action, episode_steps) # updates env.canvas, env.stepnum
-        
+
+
+        # Collect data from sampling
+        if step < opt.warmup or step % 100 == 0:
+            print("FROM SAMPLING", observation.shape)
+            #env batchsize 1 for now
+            n_strokes = 5 # TODO: param manual in ddpg.py 
+            smap = SaliencyMap(observation[0, 3:6].unsqueeze(0).float(), n_strokes = 5)
+            indices = smap.inds_normalized
+            print(indices)
+
+            action = torch.zeros((1,n_strokes*10))#.to("cuda") # batch, n strokes * 10
+            for i in range(n_strokes):
+                _action = torch.zeros(10) 
+                # data
+                _action[0] = random.random() # float(stroke_length)
+                _action[1] = random.random() # float(stroke_bend)
+                _action[2] = 0.25 #random.random() # float(stroke thickness)
+                _action[3] = 0.0 #float(stroke alpha)
+                
+                _action[4] = random.random() #float(input("rotation 0-1: ")) #rotation 
+                _action[5] = indices[i][0]
+                _action[6] = indices[i][1] 
+                
+                _action[7] = 1#color_r 
+                _action[8] = 1#color_g 
+                _action[9] = 1#color_b 
+                action[0][i*10:i*10+10]=_action
+                
+            agent.set_action(observation, action)
+
+        else:
+            #prev_observation = agent.state
+            action = agent.select_action(observation, noise_factor=noise_factor) # updates agent.action
+            #print("Action Shape:", action.shape)
+            #observation, reward, done, _, mask = env.step(action, episode_steps) # updates env.canvas, env.stepnum
+            
+            ## Add attention Map
+
         #TODO: debug gray stroke in the middle
         #TODO: decide frequency of feedback
         #print(step, episode, episode_steps)
@@ -98,7 +133,7 @@ def train(agent, env, evaluate):
                 #print("1", episode % validate_interval)
                 if validate_interval > 0 and episode % validate_interval == 0:
                     reward, dist = evaluate(env, agent.select_action, debug=debug)
-                    env.save_image(step, episode_steps)
+                    #env.save_image(step, episode_steps)
                     
                     if debug: print('Step_{:07d}: mean_reward:{:.3f} mean_dist:{:.3f} var_dist:{:.3f}'\
                         .format(step - 1, np.mean(reward), np.mean(dist), np.var(dist)))
@@ -111,24 +146,27 @@ def train(agent, env, evaluate):
             tot_Q = 0.
             tot_value_loss = 0.
             if step > opt.warmup:
-                # if step < 10000 * max_step:
-                #     lr = (9e-4, 3e-3)
-                # elif step < 20000 * max_step:
-                #     lr = (3e-4, 9e-4)
-                # else:
+                #if step < 10000 * max_step:
+                #    lr = (9e-4, 3e-3)
+                #elif step < 20000 * max_step:
+                #    lr = (3e-4, 9e-4)
+                #else:
+                lr = (3e-7, 1e-6)
+                 
                 #     lr = (9e-5, 3e-4)
                 # lr = (3e-6, 1e-5)
-                lr = (3e-7, 1e-6)
                 # if step < 10000 * max_step:
                 #     lr = (3e-4, 1e-3)
                 # elif step < 20000 * max_step:
                 #     lr = (1e-4, 3e-4)
                 # else:
                 #     lr = (3e-5, 1e-4)
+
                 for i in range(episode_train_times):
                     Q, value_loss = agent.update_policy(lr, episode_steps)
                     tot_Q += Q.data.cpu().numpy()
                     tot_value_loss += value_loss.data.cpu().numpy()
+                
                 writer.add_scalar('train/critic_lr', lr[0], step)
                 writer.add_scalar('train/actor_lr', lr[1], step)
                 writer.add_scalar('train/Q', tot_Q / episode_train_times, step)

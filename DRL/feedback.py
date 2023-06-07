@@ -91,7 +91,7 @@ class HumanFeedback:
                     stroke_length = 1.0 #float(input("stroke length: "))
                     stroke_bend = 0.5 #input("stroke bend: ")
                     stroke_z = 0.25 #input("stroke thickness: ")
-                    stroke_alpha = 0.0 #input("stroke length")
+                    stroke_alpha = 0.0 #input("stroke alpha")
 
                     # data
                     _action[0] = float(stroke_length)
@@ -103,11 +103,12 @@ class HumanFeedback:
                     _action[5] = x_coord
                     _action[6] = y_coord
                     
-                    _action[7] = 0.04#color_r 
-                    _action[8] = 0.02#color_g 
-                    _action[9] = 0.03#color_b 
+                    _action[7] = 1 #0.04#color_r 
+                    _action[8] = 1 #0.02#color_g 
+                    _action[9] = 1 #0.03#color_b 
                     
-                    #print("actions: ", _action)
+
+                    print("actions: ", _action)
                     _img = decode(_action.unsqueeze(0).to("cuda:0"), img.to("cuda:0"))
                     cv2.imshow("new image. to redraw, press 'd'", cv2.hconcat([_img[0].cpu().detach().numpy().transpose(1, 2, 0),gt]))
                     k = cv2.waitKey(0)

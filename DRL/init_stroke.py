@@ -19,18 +19,19 @@ model.eval().to("cuda")
         
 
 class SaliencyMap:
-    def __init__(self, target_im, n_strokes,  opt=None):
+    def __init__(self, target_im, n_strokes, opt=None, plot=True):
         self.opt = opt
         self.inds = None
         self.n_strokes = n_strokes
-        self.inputs = 255-target_im # MNISIT
+        self.inputs = target_im  #(B,C,H,W)
         self.canvas_width = target_im.shape[2]
         self.canvas_height = target_im.shape[3]
 
         self.define_attention_input(self.inputs)
         self.set_attention_map()
         self.set_attention_threshold_map()
-        self.plot_attention()
+        if plot:
+            self.plot_attention()
 
 
     def define_attention_input(self, target_im):
@@ -40,6 +41,7 @@ class SaliencyMap:
                     T.Resize((224,224))
                 ])
         self.image_input_attn_clip = data_transforms(target_im).to("cuda")
+        #print("attn input: ", self.image_input_attn_clip.shape)
 
 
     def plot_attention(self):
@@ -57,6 +59,7 @@ class SaliencyMap:
 
     def set_attention_threshold_map(self):
         attn_map = (self.attention_map - self.attention_map.min()) / (self.attention_map.max() - self.attention_map.min())
+        
         if True: #$self.xdog_intersec:
             xdog = XDoG_()
             im_xdog = xdog(self.image_input_attn_clip[0].permute(1,2,0).cpu().numpy(), k=10)
@@ -71,7 +74,6 @@ class SaliencyMap:
         k = self.n_strokes #1 * 4 # self.num_stages * self.num_paths
         
 
-        #print(k, attn_map_soft.flatten().shape)
         self.inds = np.random.choice(range(attn_map.flatten().shape[0]), size=k, replace=True, p=attn_map_soft.flatten())
         self.inds = np.array(np.unravel_index(self.inds, attn_map.shape)).T
         
@@ -83,10 +85,7 @@ class SaliencyMap:
 
 
     def set_attention_map(self):
-        #model, preprocess = clip.load("ViT-B/32", "cuda", jit=False)
-        #model.eval().to("cuda")
         text_input = clip.tokenize(["none"]).to("cuda")
-        
         self.attention_map = interpret(self.image_input_attn_clip, text_input, model, device="cuda")
         
 

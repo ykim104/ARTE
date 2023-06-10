@@ -83,15 +83,15 @@ class Paint:
     def load_data_celeba(self):
         # CelebA
         #global train_num, test_num, img_train, img_test, mask_train, mask_test
-        if os.path.exists('img_train.pkl') and os.path.exists('img_test.pkl'):
-            self.img_train = pickle.load(open("img_train.pkl", "rb"))
-            self.img_test = pickle.load(open("img_test.pkl", "rb"))
+        if os.path.exists('./data/img_train_celeba.pkl') and os.path.exists('./data/img_test_celeba.pkl'):
+            self.img_train = pickle.load(open("./data/img_train_celeba.pkl", "rb"))
+            self.img_test = pickle.load(open("./data/img_test_celeba.pkl", "rb"))
             self.train_num = len(self.img_train)
             self.test_num = len(self.img_test)
-        if os.path.exists('mask_train.pkl') and os.path.exists('mask_test.pkl') \
+        if os.path.exists('./data/mask_train_celeba.pkl') and os.path.exists('./data/mask_test_celeba.pkl') \
                 and (self.loss_fcn == 'cm' or self.loss_fcn == 'cml1'):
-            self.mask_train = pickle.load(open("mask_train.pkl", "rb"))
-            self.mask_test = pickle.load(open("mask_test.pkl", "rb"))
+            self.mask_train = pickle.load(open("./data/mask_train_celeba.pkl", "rb"))
+            self.mask_test = pickle.load(open("./data/mask_test_celeba.pkl", "rb"))
             
         if self.train_num == 0:
             # for i in range(100000):
@@ -121,11 +121,11 @@ class Paint:
                 finally:
                     if (i + 1) % 10000 == 0:                    
                         print('loaded {} images'.format(i + 1))
-            pickle.dump( self.img_train, open( "img_train.pkl", "wb" ) )
-            pickle.dump( self.img_test, open( "img_test.pkl", "wb" ) )
+            pickle.dump( self.img_train, open( "./data/img_train_celeba.pkl", "wb" ) )
+            pickle.dump( self.img_test, open( "./data/img_test_celeba.pkl", "wb" ) )
             if self.loss_fcn == 'cm' or self.loss_fcn == 'cml1':
-                pickle.dump( self.mask_train, open( "mask_train.pkl", "wb" ) )
-                pickle.dump( self.mask_test, open( "mask_test.pkl", "wb" ) )
+                pickle.dump( self.mask_train, open( "./data/mask_train_celeba.pkl", "wb" ) )
+                pickle.dump( self.mask_test, open( "./data/mask_test_celeba.pkl", "wb" ) )
         print('finish loading data, {} training images, {} testing images'.format(str(self.train_num), str(self.test_num)))
 
     def load_data_bird(self):
@@ -329,15 +329,15 @@ class Paint:
 
         # Sketchy dataset. From https://sketchy.eye.gatech.edu/
         #global train_num, test_num
-        if os.path.exists('img_train_sketchy.pkl') and os.path.exists('img_test_sketchy.pkl'):
-            self.img_train = pickle.load(open("img_train_sketchy.pkl", "rb"))
-            self.img_test = pickle.load(open("img_test_sketchy.pkl", "rb"))
+        if os.path.exists('./data/img_train_sketchy.pkl') and os.path.exists('./data/img_test_sketchy.pkl'):
+            self.img_train = pickle.load(open("./data/img_train_sketchy.pkl", "rb"))
+            self.img_test = pickle.load(open("./data/img_test_sketchy.pkl", "rb"))
             self.train_num = len(self.img_train)
             self.test_num = len(self.img_test)
-        if os.path.exists('mask_train_sketchy.pkl') and os.path.exists('mask_test_sketchy.pkl') \
+        if os.path.exists('./data/mask_train_sketchy.pkl') and os.path.exists('./data/mask_test_sketchy.pkl') \
                 and (self.loss_fcn == 'cm' or self.loss_fcn == 'cml1'):
-            self.mask_train = pickle.load(open("mask_train_sketchy.pkl", "rb"))
-            self.mask_test = pickle.load(open("mask_test_sketchy.pkl", "rb"))
+            self.mask_train = pickle.load(open("./data/mask_train_sketchy.pkl", "rb"))
+            self.mask_test = pickle.load(open("./data/mask_test_sketchy.pkl", "rb"))
 
         if self.train_num != 0:
             return 
@@ -421,6 +421,10 @@ class Paint:
             img = img.convert('RGB')
             img = np.asarray(img)
             img = cv2.resize(img, (width, width))
+
+            # flip back and white
+            img = 255-img
+
 
             if not test:
                 img = aug(img)

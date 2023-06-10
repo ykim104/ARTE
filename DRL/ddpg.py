@@ -13,8 +13,8 @@ from utils.util import *
 import copy
 
 from DRL.content_loss import *
-from DRL.clip_loss import *
-
+#from DRL.clip_loss import *
+from DRL.clip_loss2 import *
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -198,7 +198,6 @@ class DDPG(object):
         clip = 0.2
 
         
-
         if self.loss_fcn == 'gan':
             reward = cal_reward(canvas1, gt) - cal_reward(canvas0, gt)
         
@@ -251,11 +250,14 @@ class DDPG(object):
 
         # CLIP loss
         elif self.loss_fcn == "clip":
-            reward0 = get_clip_conv_loss(canvas0, gt)
-            reward1 = get_clip_conv_loss(canvas1, gt)
-            reward = 1.0*(reward0 - reward1)
-            #print("clip: ", reward0 - reward1)
-        #print(reward)
+            #reward0 = get_clip_conv_loss(canvas0, gt)
+            #reward1 = get_clip_conv_loss(canvas1, gt)
+
+            reward0 = clip_conv_loss(canvas0, gt)
+            reward1 = clip_conv_loss(canvas1, gt)
+            reward = 10.0*(reward0 - reward1)
+            self.writer.add_scalar('train/clip_loss_0', reward0.mean(), self.log)
+            self.writer.add_scalar('train/clip_loss_1', reward1.mean(), self.log)
 
 
         coord_ = coord.expand(state.shape[0], 2, width, width)
@@ -266,13 +268,13 @@ class DDPG(object):
         # canvas0 is not necessarily added
         if target:
             Q = self.critic_target(merged_state)
-            return (Q + reward), reward
+            return (Q + reward), reward#, [reward0, reward1]
         else:
             Q = self.critic(merged_state)
             if self.log % 20 == 0:
                 self.writer.add_scalar('train/expect_reward', Q.mean(), self.log)
                 self.writer.add_scalar('train/reward', reward.mean(), self.log)
-            return (Q + reward), reward
+            return (Q + reward), reward#, [reward0, reward1]
                 
     def update_policy(self, lr, episode_num):
         self.log += 1
@@ -313,7 +315,7 @@ class DDPG(object):
         soft_update(self.actor_target, self.actor, self.tau)
         soft_update(self.critic_target, self.critic, self.tau)
 
-        return -policy_loss, value_loss
+        return -policy_loss, value_loss#, clip_loss
 
     def observe(self, reward, state, done, step, mask):
         # s0 = torch.tensor(self.state, device='cpu')
@@ -337,14 +339,15 @@ class DDPG(object):
     def set_action(self, state, action):
         self.action = action 
         
-        #canvas = state[:, :3].float() / 255
-        #new_observation = decode(action.to("cuda:0"), canvas.to("cuda:0"), brush_color=self.opt.brush_color) 
-        #cv2.imshow("updated image",new_observation[0].cpu().detach().numpy().transpose(1, 2, 0))
-        
-        #cv2.waitKey(1)
-        #if k==27:
-        #    cv2.destroyWindow("updated image")
+        if True: #debug:
+            canvas = state[:, :3].float() / 255
+            new_observation = decode(action.to("cuda:0"), canvas.to("cuda:0"), brush_color=self.opt.brush_color) 
+            cv2.imshow("updated image",new_observation[0].cpu().detach().numpy().transpose(1, 2, 0))
             
+            k=cv2.waitKey(1)
+            if k==27:
+                cv2.destroyWindow("updated image")
+                
 
     def select_action(self, state, return_fix=False, noise_factor=0):
         self.eval()

@@ -9,8 +9,7 @@ from painter import Painter
 from options import Options
 from my_tensorboard import TensorBoard
 from strokes import *
-from paint_utils import canvas_to_global_coordinates#*
-from paint_utils3 import show_img
+from paint_utils import canvas_to_global_coordinates, show_img #*
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -25,9 +24,10 @@ coord = coord.to(device)
 
 
 parser = argparse.ArgumentParser(description='Learning to Paint')
-parser = argparse.ArgumentParser(description='Learning to Paint')
-parser.add_argument('--max_step', default=40, type=int, help='max length for episode')
-parser.add_argument('--actor', default='./../../models/DRL/Paint-run1/actor.pkl', type=str, help='Actor model')
+parser.add_argument('--use_cache', action='store_true')
+parser.add_argument('--debug', action='store_true')
+parser.add_argument('--max_step', default=10, type=int, help='max length for episode')
+parser.add_argument('--actor', default='./../../models/actor_mnist.pkl', type=str, help='Actor model')
 parser.add_argument('--renderer', default='./../../models/renderers/FRIDA_lite6_renderer_0318.pkl', type=str, help='renderer model')
 parser.add_argument('--img', default='./../../images/flower.jpg', type=str, help='test image')
 parser.add_argument('--imgid', default=0, type=int, help='set begin number for generated image')
@@ -43,16 +43,18 @@ run_name = '' + date_and_time.strftime("%m_%d__%H_%M_%S")
 writer = TensorBoard('{}/{}'.format(opt.tensorboard_dir, run_name))
 
 opt = Options()
+opt.use_cache = args.use_cache
+opt.dont_retrain_stroke_model = True 
 opt.gather_options()
-
 
 """
 Get Target Imge (or target text for the future)
 """
 img = cv2.imread(args.img, cv2.IMREAD_COLOR)
 img_shape = (img.shape[1], img.shape[0])
-target_img = cv2.resize(img, (width, width))
-target_img = target_img.reshape(1, width, width, 3)
+
+img = cv2.resize(img, (width, width))
+target_img = img.reshape(1, width, width, 3)
 target_img = np.transpose(target_img, (0, 3, 1, 2))
 target_img = torch.tensor(target_img).to(device).float() / 255.
 
@@ -69,15 +71,17 @@ from Renderer.model import FCN
 
 n_strokes = 5
 actor = ResNet(9,18,10*n_strokes) # state_size, 18, 10*n_strokes
-actor.load_state_dict(torch.load(args.actor)).to(device).eval()
+actor.load_state_dict(torch.load(args.actor))
+actor.to(device).eval()
 
 sim_renderer = FCN(input_size=7)
-sim_renderer.load_state_dict(torch.load(args.renderer)).to(device).eval()
+sim_renderer.load_state_dict(torch.load(args.renderer))
+sim_renderer.to(device).eval()
 
 
 def decode(x, canvas, brush_color="color"): # b * (10 + 3)
     x = x.view(-1, 7 + 3)
-    stroke = 1 - Decoder(x[:, :7])
+    stroke = 1 - sim_renderer(x[:, :7])
     stroke = stroke.view(-1, width, width, 1)
     
     if brush_color=="color":
@@ -112,8 +116,8 @@ Painter object that holds fnxs for
 - cache 
 - param2img.pt (model that I won't be using. For FRIDA paper)
 """
-painter = Painter(opt, robot="lite6", use_cache=True, writier=writer) 
-
+painter = Painter(opt, robot="lite6", use_cache=True, writer=writer) 
+print("Painter loaded.")
 
 
 # get canvas
@@ -135,21 +139,35 @@ strokes_without_cleaning = 9999
 painter.to_neutral()
 
 canvas = painter.camera.get_canvas()
-canvas = torch.tensor(canvas).to(device).float()/255.
+canvas = cv2.resize(canvas,(width, width))
 
+sim_canvas = None
 with torch.no_grad():
     if args.divide == 1:
         for i in range(args.max_step):
                 # get simulated canvas
-                stepnum = T * i / args.max_step                 
-                state = torch.cat([canvas, target_img, stepnum, coord],1) # 3,3,1,2
+                stepnum = T * i / args.max_step 
+
+                canvas = torch.tensor(canvas)
+                canvas = torch.permute(canvas,(2,0,1))
+                canvas = canvas.unsqueeze(0).to(device).float()/255.
+                               
+                if sim_canvas is not None & opt.debug:
+                    print("using simulated canvas")
+                    state = torch.cat([sim_canvas, target_img, stepnum, coord],1) # 3,3,1,2
+                    actions = actor(state)                
+                    sim_canvas, res = decode(actions, sim_canvas, brush_color="black")
                 
-                actions = actor(state)
+                else:
+                    state = torch.cat([canvas, target_img, stepnum, coord],1) # 3,3,1,2
+                    actions = actor(state)                
+                    sim_canvas, res = decode(actions, canvas, brush_color="black")
                 
-                sim_canvas, res = decode(actions, canvas, brush_color="black")
-                
+                '''
                 # paint strokes
+                actions = actions.cpu().detach().numpy()
                 for i in range(n_strokes):
+    
                     stroke_length = actions[i][0]
                     bend = actions[i][1]
                     z = actions[i][2]
@@ -183,12 +201,17 @@ with torch.no_grad():
 
                     #paint
                     stroke.paint(painter, x, y, rotation, wait=True)
+                '''
 
                 canvas = painter.camera.get_canvas()
-                canvas = torch.tensor(canvas).to(device).float()/255.
+                canvas = cv2.resize(canvas,(width, width))
 
-                all_canvases = cv2.hconcat([sim_canvas, canvas])
-                show_img(all_canvases, title="In Progress...{}".format(stepnum))
+                sim_canvas_copy = sim_canvas.cpu().detach().numpy()[0].transpose((1,2,0))
+                sim_canvas_copy *= 255 # or any coefficient
+                sim_canvas_copy = sim_canvas_copy.astype(np.uint8)
+                
+                all_canvases = cv2.hconcat((sim_canvas_copy, canvas, img))
+                show_img(all_canvases, title="In Progress...")
 
 
 canvas_after = painter.camera.get_canvas()

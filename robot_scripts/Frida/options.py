@@ -88,7 +88,7 @@ class Options(object):
         # parser.add_argument('--target', type=str, default=None)
         # parser.add_argument('--prompt', type=str, default=None)
         parser.add_argument("--cache_dir", type=str,
-            default='/tmp', help='Where to store cached files.')
+            default='./cache', help='Where to store cached files.')
         parser.add_argument("--tensorboard_dir", type=str,
             default='./painting', help='Where to write tensorboard log to.')
         parser.add_argument("--global_it", type=int,
@@ -160,8 +160,8 @@ class Options(object):
             print('Must specify --brush_length cmd line param. Measure the brush length.')
 
         if self.ink:
-            self.MAX_STROKE_LENGTH = 0.02
-            self.MAX_BEND = 0.01 #1cm
+            self.MAX_STROKE_LENGTH = 60 #0.02
+            self.MAX_BEND = 20 #0.01 #1cm
 
 
     def __getattr__(self, attr_name):

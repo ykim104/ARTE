@@ -31,6 +31,19 @@ To change the range of parameters of strokes to generate, update those values in
 
 #### Painting with a Robot
 
+```
+python3 paint_inference.py --use_cache
+```
+
+paramas to use
+- --use_cache
+- --max_step
+- --actor
+- --renderer
+- --img
+- --imgid
+- --divide
+- --debug
 
 ### References
 1. https://github.com/cmubig/Frida

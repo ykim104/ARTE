@@ -84,6 +84,7 @@ class Painter():
         
         self.writer = writer 
 
+        print("GOOD MORNING ROBOT")
         self.robot.good_morning_robot()
 
         # Setup Camera
@@ -102,15 +103,19 @@ class Painter():
                     input('Could not connect camera. Try turning it off and on, then press start.')
                 except SyntaxError:
                     pass
-                
+        print("CAMERA LOADED.")
+
         self.H_coord = None # Translate coordinates based on faulty camera location
 
         # p = canvas_to_global_coordinates(0, 0.5, self.opt.INIT_TABLE_Z, self.opt)
         # self.move_to(p[0], p[1], self.opt.INIT_TABLE_Z, speed=0.2)
         self.to_neutral()
+        print("MOVED TO NEUTRAL")
 
         # Set how high the table is wrt the brush
+        print("use cache: ", use_cache)
         if use_cache and os.path.exists(os.path.join(self.opt.cache_dir, "cached_params.pkl")):
+            print("Using cache")
             params = pickle.load(open(os.path.join(self.opt.cache_dir, "cached_params.pkl"),'rb'))
             self.Z_CANVAS = params['Z_CANVAS']
             self.Z_MAX_CANVAS = params['Z_MAX_CANVAS']
@@ -158,7 +163,7 @@ class Painter():
         if self.camera is not None:
             self.camera.debug = True
             self.camera.calibrate_canvas(use_cache=use_cache)
-
+            print("Calibrate Canvas")
 
         #input("Take a Picture")
         img = self.camera.get_canvas()
@@ -166,6 +171,8 @@ class Painter():
 
         # Ensure that x,y on the canvas photograph is x,y for the robot interacting with the canvas
         self.coordinate_calibration(use_cache=opt.use_cache)
+        print("Calibrate coordinate")
+
 
         # self.paint_fill_in_library() ######################################################
 
@@ -184,7 +191,7 @@ class Painter():
                 self.create_continuous_stroke_model()
 
         # self.manipulation_project()
-
+        print("Done Initializing Painter Class")
 
     def to_neutral(self, speed=0.4):
         # Initial spot

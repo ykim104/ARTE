@@ -62,32 +62,34 @@ def train(agent, env, evaluate):
 
 
         # Collect data from sampling
-        if step < opt.warmup or step % 100 == 0:
+        if step < opt.warmup:
             print("FROM SAMPLING", observation.shape)
-            #env batchsize 1 for now
             n_strokes = 5 # TODO: param manual in ddpg.py 
-            smap = SaliencyMap(observation[0, 3:6].unsqueeze(0).float(), n_strokes = 5)
-            indices = smap.inds_normalized
-            print(indices)
-
-            action = torch.zeros((1,n_strokes*10))#.to("cuda") # batch, n strokes * 10
-            for i in range(n_strokes):
-                _action = torch.zeros(10) 
-                # data
-                _action[0] = random.random() # float(stroke_length)
-                _action[1] = random.random() # float(stroke_bend)
-                _action[2] = 0.25 #random.random() # float(stroke thickness)
-                _action[3] = 0.0 #float(stroke alpha)
+            action = torch.zeros((1, n_strokes*10))#.to("cuda") # batch, n strokes * 10
+            
+            for b in range(1):
+                #env batchsize 1 for now
+                smap = SaliencyMap(observation[b, 3:6].unsqueeze(0).float(), n_strokes = 5, plot=True)
+                indices = smap.inds_normalized
                 
-                _action[4] = random.random() #float(input("rotation 0-1: ")) #rotation 
-                _action[5] = indices[i][0]
-                _action[6] = indices[i][1] 
-                
-                _action[7] = 1#color_r 
-                _action[8] = 1#color_g 
-                _action[9] = 1#color_b 
-                action[0][i*10:i*10+10]=_action
-                
+                #action = torch.zeros((1,n_strokes*10))#.to("cuda") # batch, n strokes * 10
+                for i in range(n_strokes):
+                    _action = torch.zeros(10) 
+                    # data
+                    _action[0] = random.random() # float(stroke_length)
+                    _action[1] = random.random() # float(stroke_bend)
+                    _action[2] = 0.25 #random.random() # float(stroke thickness)
+                    _action[3] = 0.0 #float(stroke alpha)
+                    
+                    _action[4] = random.random() #float(input("rotation 0-1: ")) #rotation 
+                    _action[5] = indices[i][0]
+                    _action[6] = indices[i][1] 
+                    
+                    _action[7] = 1#color_r 
+                    _action[8] = 1#color_g 
+                    _action[9] = 1#color_b 
+                    action[b][i*10:i*10+10]=_action
+                    
             agent.set_action(observation, action)
 
         else:
@@ -146,13 +148,14 @@ def train(agent, env, evaluate):
             tot_Q = 0.
             tot_value_loss = 0.
             if step > opt.warmup:
-                #if step < 10000 * max_step:
-                #    lr = (9e-4, 3e-3)
-                #elif step < 20000 * max_step:
-                #    lr = (3e-4, 9e-4)
-                #else:
-                lr = (3e-7, 1e-6)
-                 
+                if step < 10000 * max_step:
+                    lr = (9e-4, 3e-3)
+                elif step < 20000 * max_step:
+                    lr = (3e-4, 9e-4)
+                else:
+                    lr = (3e-7, 1e-6)
+                
+                #lr = (3e-7, 1e-6) 
                 #     lr = (9e-5, 3e-4)
                 # lr = (3e-6, 1e-5)
                 # if step < 10000 * max_step:
@@ -167,10 +170,14 @@ def train(agent, env, evaluate):
                     tot_Q += Q.data.cpu().numpy()
                     tot_value_loss += value_loss.data.cpu().numpy()
                 
+                    
                 writer.add_scalar('train/critic_lr', lr[0], step)
                 writer.add_scalar('train/actor_lr', lr[1], step)
                 writer.add_scalar('train/Q', tot_Q / episode_train_times, step)
                 writer.add_scalar('train/critic_loss', tot_value_loss / episode_train_times, step)
+                
+                
+
             if debug: print('#{}: steps:{} interval_time:{:.2f} train_time:{:.2f}' \
                 .format(episode, step, train_time_interval, time.time()-time_stamp)) 
             time_stamp = time.time()

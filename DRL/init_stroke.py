@@ -19,7 +19,7 @@ model.eval().to("cuda")
         
 
 class SaliencyMap:
-    def __init__(self, target_im, n_strokes, opt=None, plot=True):
+    def __init__(self, target_im, n_strokes, opt=None, plot=False):
         self.opt = opt
         self.inds = None
         self.n_strokes = n_strokes
@@ -78,8 +78,8 @@ class SaliencyMap:
         self.inds = np.array(np.unravel_index(self.inds, attn_map.shape)).T
         
         self.inds_normalized = np.zeros(self.inds.shape)
-        self.inds_normalized[:, 0] =  self.inds[:, 1] * (1 / 224)
-        self.inds_normalized[:, 1] =  self.inds[:, 0] * (1/ 224)
+        self.inds_normalized[:, 0] =  self.inds[:, 1] * (1/224)
+        self.inds_normalized[:, 1] =  self.inds[:, 0] * (1/224)
         self.inds_normalized = self.inds_normalized.tolist()
 
 

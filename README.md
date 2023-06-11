@@ -40,6 +40,18 @@ To monitor the training progress,
     tensorboard --logdir train_log_deleteme/
 ```
 
+Table of tried hyperparameters
+
+
+| Dataset   | LR                                 | Loss  | Loss Weights                     | Seed  | BS | Max Step | Warmup | Replay |
+|-----------|------------------------------------|-------|----------------------------------|-------|----|----------|--------|--------|
+| MNIST     |(9e-4,3e-3),(3e-4,9e-4),(3e-7,1e-6) | clip2 |x10 reward,[0.3,0.3,1,1,1.0],[0.1]| 1321  | 8  | 10       | 200    | 400    |
+| Sketchy   |(3e-4,9e-4),(3e-4,9e-4),(3e-7,1e-6) | clip2 |x16 reward,[0.3,0.3,1,1,1.0],[0.1]| 1321  | 8  | 10       | 200    | 400    |
+| CelebA    |(9e-5,3e-4),(3e-6,1e-5),(3e-7,1e-6) | clip2 |x100reward,[0.3,0.3,1,1,1.0],[0.1]| 1321  | 32 | 40       | 1000   | 400    | 
+| Pascal    |(3e-7,1e-6)                         | clip2 |x160reward,[0.3,0.3,1,1,1.0],[0.1]| 1321  | 32 | 40       | 1000   | 400    |
+
+
+
 
 #### 2.4 Paint by Inferences
 

@@ -43,6 +43,10 @@ def train(agent, env, evaluate):
         feedback_type = opt.feedback_type
         feedback_max = opt.feedback_max
 
+    if opt.warmup >= 0:
+        print("Collect data from Stroke Initialization Sampling.") #, observation.shape)
+
+
     pbar = tqdm(total=train_times)
     while step <= train_times:
         step += 1
@@ -63,13 +67,12 @@ def train(agent, env, evaluate):
 
         # Collect data from sampling
         if step < opt.warmup:
-            print("FROM SAMPLING", observation.shape)
             n_strokes = 5 # TODO: param manual in ddpg.py 
             action = torch.zeros((1, n_strokes*10))#.to("cuda") # batch, n strokes * 10
             
             for b in range(1):
                 #env batchsize 1 for now
-                smap = SaliencyMap(observation[b, 3:6].unsqueeze(0).float(), n_strokes = 5, plot=True)
+                smap = SaliencyMap(observation[b, 3:6].unsqueeze(0).float(), n_strokes = 5, plot=False)
                 indices = smap.inds_normalized
                 
                 #action = torch.zeros((1,n_strokes*10))#.to("cuda") # batch, n strokes * 10
@@ -149,21 +152,25 @@ def train(agent, env, evaluate):
             tot_value_loss = 0.
             if step > opt.warmup:
                 if step < 10000 * max_step:
-                    lr = (9e-4, 3e-3)
+                    #lr = (9e-4, 3e-3)
+                    #lr = (3e-4, 9e-4)
+                    lr = (9e-5, 3e-4)
+                    #lr = (3e-6, 1e-5) # for CelebA & Pascal
                 elif step < 20000 * max_step:
-                    lr = (3e-4, 9e-4)
+                    #lr = (3e-4, 9e-4)
+                    lr = (3e-6, 1e-5)
                 else:
                     lr = (3e-7, 1e-6)
                 
-                #lr = (3e-7, 1e-6) 
-                #     lr = (9e-5, 3e-4)
-                # lr = (3e-6, 1e-5)
-                # if step < 10000 * max_step:
-                #     lr = (3e-4, 1e-3)
-                # elif step < 20000 * max_step:
-                #     lr = (1e-4, 3e-4)
-                # else:
-                #     lr = (3e-5, 1e-4)
+                lr = (3e-7, 1e-6) 
+                #lr = (9e-5, 3e-4)
+                #lr = (3e-6, 1e-5)
+                #if step < 10000 * max_step:
+                #    lr = (3e-4, 1e-3)
+                #elif step < 20000 * max_step:
+                #    lr = (1e-4, 3e-4)
+                #else:
+                #    lr = (3e-5, 1e-4)
 
                 for i in range(episode_train_times):
                     Q, value_loss = agent.update_policy(lr, episode_steps)

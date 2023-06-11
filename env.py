@@ -302,7 +302,7 @@ class Paint:
         #global train_num, test_num
 
         i = 0
-        img_dir = './VOC2012/JPEGImages/'
+        img_dir = './data/VOCdevkit/VOC2012/JPEGImages/'
         fn_ar = []
         for filename in os.listdir(img_dir):
             fn_ar.append(filename)
@@ -324,7 +324,7 @@ class Paint:
         print('finish loading data, {} training images, {} testing images'.format(str(self.train_num), str(self.test_num)))
 
     def load_data_sketchy(self):
-        self.dilation_rate = 3 #6 #3 #3
+        self.dilation_rate = 4 #3 #6 #3 #3
         self._env_count = 0
 
         # Sketchy dataset. From https://sketchy.eye.gatech.edu/

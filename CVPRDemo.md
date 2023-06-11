@@ -9,3 +9,6 @@ Booth: 10x10 foot space
 A TV Monitor
 4x8 foot poster board
 
+
+CVPR Poster Template
+https://docs.google.com/presentation/d/1riJNbxX1MNDW7xPzBsij_PyZt1764Tkl/edit#slide=id.p1 

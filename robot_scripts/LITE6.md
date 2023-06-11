@@ -1,5 +1,19 @@
 # UFactory LITE6 
 
+1. Hand-eye calibration (draw dots) 
+
+2. generate brush stroke libraries. 2+ papers(how many strokes did I collect last time?) 
+
+3. train brush strokes (FRIDA param2img) 
+
+4. train renderer for DRL env (FRIDA param2img -> Decoder FCN)  
+
+5. train policy/actor (DDPG) 
+
+6. inference; paint with a robot
+
+
+
 #### Starting
 
 URL: <ip.add.re.ss>:18333

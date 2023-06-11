@@ -255,7 +255,7 @@ class DDPG(object):
 
             reward0 = clip_conv_loss(canvas0, gt)
             reward1 = clip_conv_loss(canvas1, gt)
-            reward = 10.0*(reward0 - reward1)
+            reward = 160.0*(reward0 - reward1)
             self.writer.add_scalar('train/clip_loss_0', reward0.mean(), self.log)
             self.writer.add_scalar('train/clip_loss_1', reward1.mean(), self.log)
 

@@ -9,10 +9,12 @@ class Lite6(Robot, object):
         Low-level action functionality of the Franka robot.
     '''
 
-    def __init__(self, debug, node_name="painting"):
+    def __init__(self, debug, brush_size = 12, node_name="painting"):
         from xarm.wrapper import XArmAPI
 
         self.debug_bool = debug
+        self.brush_size = brush_size
+
         self.robot =XArmAPI('192.168.1.162')
         self.robot.connect()
         self.robot.motion_enable(enable=True)
@@ -38,8 +40,11 @@ class Lite6(Robot, object):
         self.robot.set_state(0)
         
         if goal_pos is None:
-            #goal_pos = [0., 9.9, 31.8, 0., 21.9, 0., 0.]#self.robot.
             goal_pos = [0., 9.9, 31.8, 0., 21.9, 0., 0.]#self.robot.
+            if self.brush_size == 12:
+                goal_pos = [0., 9.9, 31.8, 0., 21.9, 0., 0.]#self.robot. Size12 brush
+            if self.brush_size == 10:
+                goal_pos = [0., 1.5, 34.8, 0., 33.3, 0., 0.] # size 10 brush
         code, curr_pos = self.robot.get_servo_angle(is_radian=False)
         try:
             if code==0:

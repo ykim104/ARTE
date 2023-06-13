@@ -33,8 +33,8 @@ try: import rospy
 except: pass
 
 PERPENDICULAR_QUATERNION = np.array([1.77622069e-04,   9.23865441e-01,  -3.82717408e-01,  -1.73978366e-05])
-PROP_MINMAX_H = [0.05, 0.85] #[0.0, 0.8] #Y robot coord. right -> left
-PROP_MINMAX_W = [0.15, 0.85] # 0.85
+PROP_MINMAX_H = [0.1, 0.9] #[0.05, 0.85] #[0.0, 0.8] #Y robot coord. right -> left
+PROP_MINMAX_W = [0.1, 0.9] #[0.15, 0.85] # 0.85 # 0.85
 
 def shift_image(X, dx, dy):
     X = np.roll(X, dy, axis=0)
@@ -148,7 +148,7 @@ class Painter():
         #self.robot.reset()
 
         #self.PALLETTE_POSITION = (36, 290, self.Z_CANVAS-60)#(-0.12,.32,self.Z_CANVAS- 0.2*self.Z_RANGE)
-        self.PALLETTE_POSITION = (25.7, 288, self.Z_CANVAS-75)#(-0.12,.32,self.Z_CANVAS- 0.2*self.Z_RANGE)
+        self.PALLETTE_POSITION = (25.7, 293, self.Z_CANVAS-75)#(-0.12,.32,self.Z_CANVAS- 0.2*self.Z_RANGE)
         self.PAINT_DIFFERENCE = 0.03976
         #self.get_paint(0)
         #self.robot.rotate(0)
@@ -157,6 +157,7 @@ class Painter():
         # while True: 
         #     self.locate_items()
 
+        input("Take a Picture")
         # self.locate_canvas()
         # self.calibrate_robot_tilt()
 
@@ -165,7 +166,6 @@ class Painter():
             self.camera.calibrate_canvas(use_cache=use_cache)
             print("Calibrate Canvas")
 
-        #input("Take a Picture")
         img = self.camera.get_canvas()
         self.opt.CANVAS_WIDTH_PIX, self.opt.CANVAS_HEIGHT_PIX = img.shape[1], img.shape[0]
 
@@ -547,6 +547,7 @@ class Painter():
 
                 # Look in the region of the stroke and find the center of the stroke
                 w = int(.1 * canvas_height_pix)
+                
                 window = canvas[y_pix-w:y_pix+w, x_pix-w:x_pix+w,:]
                 window = window.mean(axis=2)
                 window /= 255.

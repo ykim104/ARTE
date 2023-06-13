@@ -36,7 +36,7 @@ class Options(object):
         # self.CANVAS_POSITION = (0,.5) 
         #self.CANVAS_POSITION = (0.34, .27) # 14x11"
         #self.CANVAS_POSITION = (0+0.0762, .5-.04) # 20x16"
-        self.CANVAS_POSITION = (90, 270) #(90,270) ## (110, 250) (110.0 + 25, 250.0 - 25) # (w,h)Yejin's setup. 20x16
+        self.CANVAS_POSITION = (90, 245) #(90, 270) #(90,270) ## (110, 250) (110.0 + 25, 250.0 - 25) # (w,h)Yejin's setup. 20x16
         # self.CANVAS_POSITION = (0+0.0762-0.12, .5-.04-0.0635-0.06+.202)# 10x8"
 
         """ How many times in a row can you paint with the same color before needing more paint """
@@ -160,8 +160,8 @@ class Options(object):
             print('Must specify --brush_length cmd line param. Measure the brush length.')
 
         if self.ink:
-            self.MAX_STROKE_LENGTH = 60 #0.02
-            self.MAX_BEND = 20 #0.01 #1cm
+            self.MAX_STROKE_LENGTH = 0.06 # 60 #0.02
+            self.MAX_BEND = 0.02 #20 #0.01 #1cm
 
 
     def __getattr__(self, attr_name):

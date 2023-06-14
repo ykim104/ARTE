@@ -2,7 +2,9 @@
 data/
 models/DRL
 train_log_deleteme/
-robot_scripts/Frida/painting
+robot_scripts/Frida/cache/
+robot_scripts/Frida/painting/
+robot_scripts/painting/
 
 # CLIP
 CLIP_/

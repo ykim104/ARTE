@@ -282,8 +282,10 @@ class Painter():
 
     def clean_paint_brush(self):
         if self.opt.simulate: return
+        self.move_to(x,y,self.Z_CANVAS) # HOVER First z+self.opt.HOVER_FACTOR)
         self.move_to(self.WATER_POSITION[0],self.WATER_POSITION[1],self.WATER_POSITION[2]+0.09, speed=0.3)
         self.dip_brush_in_water()
+        self.move_to(x,y,self.Z_CANVAS) # HOVER First z+self.opt.HOVER_FACTOR)
         #TODO: yejin
         #self.rub_brush_on_rag()
 

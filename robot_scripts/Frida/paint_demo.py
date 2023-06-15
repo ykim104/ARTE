@@ -43,7 +43,7 @@ class RobotPainter():
         self.renderer.load_state_dict(torch.load(opt.renderer))
         self.renderer.to(device).eval()
 
-        self.strokes_without_cleaning = 0
+        self.strokes_without_cleaning = 12
         self.strokes_without_getting_new_paint = 4
         self.painter = Painter(opt, robot="lite6", use_cache=opt.use_cache, writer=opt.writer) 
         time.sleep(2.5)
@@ -295,7 +295,10 @@ if __name__ == "__main__":
     
 
     robot_painter = RobotPainter(target, opt)
-    
+    #robot_painter.painter.clean_paint_brush()
+
+    cv2.namedWindow("stream", cv2.WINDOW_NORMAL)        # Create window with freedom of dimensions
+
     while True:
         co = robot_painter.canvas_orig
         c = robot_painter.canvas
@@ -306,8 +309,11 @@ if __name__ == "__main__":
             sim = c 
 
         if c is not None and co is not None and sim is not None:
-            cv2.imshow("stream", cv2.hconcat((sim, c, co, tim)))
+            all_images = cv2.hconcat((sim, co, tim))
+            #all_shape = all_images.shape
+            #print(all_shape)
+            #all_images = cv2.resize(all_images, (all_shape[0]*2,all_shape[1]*2))
+            cv2.imshow("stream", all_images)
             if cv2.waitKey(1) & 0xFF == ord('q'): # wait for 1 millisecond
                 break
-
     cv2.destroyAllWindows()

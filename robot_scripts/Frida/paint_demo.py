@@ -16,7 +16,7 @@ from options import Options
 sys.path.append(os.path.abspath("./../.."))
 from DRL.actor import *
 from Renderer.model import FCN
-
+from stable_diffusion.sd import StableDiffusionAdaptivePainter
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -33,6 +33,9 @@ class RobotPainter():
         self.sim_canvas = None 
         self._sim_canvas_img = None
         self.get_target(target)
+
+        self.use_generator = opt.use_generator
+        self.generator = StableDiffusionAdaptivePainter(batch_size=1,max_step=20)
 
         self.n_strokes = 5
         self.actor = ResNet(9,18,10*self.n_strokes)
@@ -144,7 +147,6 @@ class RobotPainter():
 
     def paint_stroke(self, stepnum, coord, simulate=True):
         #stepnum = T * self.counter / args.max_step 
-    
         if simulate:
             #if self.sim_canvas is None and self.canvas is None:
             #    self.sim_canvas = torch.ones((3,width,width))   
@@ -156,6 +158,9 @@ class RobotPainter():
                 canvas = canvas.unsqueeze(0).to(device).float()/255.
                 self.sim_canvas = canvas
                    
+            if self.use_generator:
+                self.target_img = self.generator.generate_image(prompt, self.generator.transform_to_img(self.sim_canvas[0]), self.target_img)
+    
             state = torch.cat([self.sim_canvas, self.target_img, stepnum, coord],1) # 3,3,1,2
         else:
             # move robot to zero joints first
@@ -170,6 +175,10 @@ class RobotPainter():
             canvas = torch.tensor(canvas)
             canvas = torch.permute(canvas,(2,0,1))
             canvas = canvas.unsqueeze(0).to(device).float()/255.
+
+            if self.use_generator:
+                self.target_img = self.generator.generate_image(prompt, self.generator.transform_to_img(canvas[0]), self.target_img)
+
             state = torch.cat([canvas, self.target_img, stepnum, coord],1) # 3,3,1,2
         actions = self.actor(state)
 
@@ -271,6 +280,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Paint Demo')
     parser.add_argument('--use_cache', action='store_true')
+    parser.add_argument('--use_generator', action='store_true')
     parser.add_argument('--debug', default=False, type=bool)
     parser.add_argument('--max_steps', default=40, type=int, help='max length for episode')
     parser.add_argument('--actor', default='./../../models/actor.pkl', type=str, help='Actor model')
@@ -285,6 +295,7 @@ if __name__ == "__main__":
     opt.renderer = args.renderer
     opt.debug = args.debug
     opt.use_cache = args.use_cache
+    opt.use_generator = args.use_generator
     opt.dont_retrain_stroke_model = True 
     opt.gather_options()
     opt.writer = TensorBoard('{}/{}'.format(opt.tensorboard_dir, run_name))

@@ -22,9 +22,11 @@ Yejin Kim and Dohyek Lee
 
 ### 2. Run in Simulation
 #### 2.1. Installation
+install clip and stable diffusion
+
 ```
     virtualenv venv -p python3.8
-    pip install torch==1.13.1+cu117 scipy==1.5
+    pip install torch==1.13.1+cu117 scipy==1.5 einops pytorch_lightning
     pip install git+https://github.com/openai/CLIP.git
     mv CLIP CLIP_
 ```

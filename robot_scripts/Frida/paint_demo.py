@@ -141,11 +141,11 @@ class RobotPainter():
     def paint(self):
         for i in range(40):
             stepnum = T * i / args.max_steps 
-            self.paint_stroke(stepnum.to(device), coord, simulate=False)
+            self.paint_stroke(i, stepnum.to(device), coord, simulate=False)
             print("Paint Step ", i)
 
 
-    def paint_stroke(self, stepnum, coord, simulate=True):
+    def paint_stroke(self, i, stepnum, coord, simulate=True):
         #stepnum = T * self.counter / args.max_step 
         if simulate:
             #if self.sim_canvas is None and self.canvas is None:
@@ -159,6 +159,8 @@ class RobotPainter():
                 self.sim_canvas = canvas
                    
             if self.use_generator:
+                self.generator.max_step = 40-i
+                self.generator.set_scheduler()
                 self.target_img = self.generator.generate_image(prompt, self.generator.transform_to_img(self.sim_canvas[0]), self.target_img)
     
             state = torch.cat([self.sim_canvas, self.target_img, stepnum, coord],1) # 3,3,1,2
@@ -177,6 +179,8 @@ class RobotPainter():
             canvas = canvas.unsqueeze(0).to(device).float()/255.
 
             if self.use_generator:
+                self.generator.max_step = 40-i
+                self.generator.set_scheduler()
                 self.target_img = self.generator.generate_image(prompt, self.generator.transform_to_img(canvas[0]), self.target_img)
 
             state = torch.cat([canvas, self.target_img, stepnum, coord],1) # 3,3,1,2

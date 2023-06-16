@@ -97,6 +97,7 @@ class Lite6(Robot, object):
                 precise (bool) : use precise for slow short movements. else use False, which is fast but unstable
         """
         self.robot.set_mode(0)
+        #self.robot.set_mode(1)
         self.robot.set_state(0)
         
         positions, orientations = np.array(positions), np.array(orientations)
@@ -106,19 +107,21 @@ class Lite6(Robot, object):
 
         if precise:
             #self.go_to_cartesian_pose_precise(positions, orientations)
-            print("Precise Mode Requested but will use Stable Mode.")
+            #print("Precise Mode Requested but will use Stable Mode.")
             self.go_to_cartesian_pose_stable(positions, orientations, wait=True)
         else:
-            print("Stable mode request.")
-            self.go_to_cartesian_pose_stable(positions, orientations, wait=False)
+            #print("Stable mode request.")
+            #self.go_to_cartesian_pose_stable(positions, orientations, wait=False)
+            self.go_to_cartesian_pose_stable(positions, orientations, wait=True)
 
     def rotate(self, z_degree, wait=False):
         self.robot.set_mode(1)
         self.robot.set_servo_angle(servo_id=6, angle=z_degree, is_radian=False)
 
     def go_to_cartesian_pose_stable(self, positions, orientations, wait=False):
-        self.robot.set_mode(0)
-        self.robot.set_state(0)
+        #self.robot.set_mode(1)#0
+        #self.robot.set_state(0)
+        
         for i in range(len(positions)):
             pos = positions[i]
             rt = Lite6.create_rotation_transform(pos, orientations[i])

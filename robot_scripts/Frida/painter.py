@@ -142,8 +142,8 @@ class Painter():
         # print('2')
         self.Z_RANGE = np.abs(self.Z_MAX_CANVAS - self.Z_CANVAS)
 
-        self.WATER_POSITION = (36.7, 240, self.Z_CANVAS-70) #(-.25,.50,self.Z_CANVAS)
-        self.RAG_POSTITION = (-.35,.27,self.Z_CANVAS)
+        self.WATER_POSITION = (45, 220, self.Z_CANVAS-70) #(-.25,.50,self.Z_CANVAS)
+        self.RAG_POSTITION = (-30,260,self.Z_CANVAS-90)
         #self.dip_brush_in_water()
         #self.robot.reset()
 
@@ -262,32 +262,39 @@ class Painter():
         positions.append([self.WATER_POSITION[0],self.WATER_POSITION[1],self.WATER_POSITION[2]+self.opt.HOVER_FACTOR])
         positions.append([self.WATER_POSITION[0],self.WATER_POSITION[1],self.WATER_POSITION[2]])
         for i in range(5):
-            noise = np.clip(np.random.randn(2)*0.01, a_min=-.02, a_max=0.02)
+            noise = np.clip(np.random.randn(2)*15, a_min=-15, a_max=15)
             positions.append([self.WATER_POSITION[0]+noise[0],self.WATER_POSITION[1]+noise[1],self.WATER_POSITION[2]])
         positions.append([self.WATER_POSITION[0],self.WATER_POSITION[1],self.WATER_POSITION[2]+self.opt.HOVER_FACTOR])
         orientations = [None]*len(positions)
+        
+        print(positions)
         self.move_to_trajectories(positions, orientations, precise=True)
 
     def rub_brush_on_rag(self):
-        self.move_to(self.RAG_POSTITION[0],self.RAG_POSTITION[1],self.RAG_POSTITION[2]+self.opt.HOVER_FACTOR, speed=0.3)
+        self.move_to(self.WATER_POSITION[0],self.WATER_POSITION[1],self.Z_CANVAS) # HOVER First z+self.opt.HOVER_FACTOR)
+        self.move_to(self.RAG_POSTITION[0],self.RAG_POSTITION[1],self.Z_CANVAS, speed=0.3)
         positions = []
         positions.append([self.RAG_POSTITION[0],self.RAG_POSTITION[1],self.RAG_POSTITION[2]+self.opt.HOVER_FACTOR])
         positions.append([self.RAG_POSTITION[0],self.RAG_POSTITION[1],self.RAG_POSTITION[2]])
         for i in range(5):
-            noise = np.clip(np.random.randn(2)*0.06, a_min=-.06, a_max=0.06)
-            positions.append([self.RAG_POSTITION[0]+noise[0],self.RAG_POSTITION[1]+noise[1],self.RAG_POSTITION[2]])
+            noise = np.clip(np.random.randn(1)*30, a_min=-30, a_max=30)
+            positions.append([self.RAG_POSTITION[0],self.RAG_POSTITION[1]+noise[0],self.RAG_POSTITION[2]])
         positions.append([self.RAG_POSTITION[0],self.RAG_POSTITION[1],self.RAG_POSTITION[2]+self.opt.HOVER_FACTOR])
         orientations = [None]*len(positions)
+       
+        print(positions)
         self.move_to_trajectories(positions, orientations, precise=True)
+        self.move_to(self.RAG_POSTITION[0],self.RAG_POSTITION[1],self.Z_CANVAS, speed=0.3)
+        print("Rubbing brush on rag done.")
 
     def clean_paint_brush(self):
         if self.opt.simulate: return
-        self.move_to(x,y,self.Z_CANVAS) # HOVER First z+self.opt.HOVER_FACTOR)
-        self.move_to(self.WATER_POSITION[0],self.WATER_POSITION[1],self.WATER_POSITION[2]+0.09, speed=0.3)
+        self.move_to(self.WATER_POSITION[0],self.WATER_POSITION[1],self.Z_CANVAS) # HOVER First z+self.opt.HOVER_FACTOR)
         self.dip_brush_in_water()
-        self.move_to(x,y,self.Z_CANVAS) # HOVER First z+self.opt.HOVER_FACTOR)
-        #TODO: yejin
-        #self.rub_brush_on_rag()
+        self.move_to(self.WATER_POSITION[0],self.WATER_POSITION[1],self.Z_CANVAS) # HOVER First z+self.opt.HOVER_FACTOR)
+        self.rub_brush_on_rag()
+        self.move_to(self.WATER_POSITION[0],self.WATER_POSITION[1],self.Z_CANVAS) # HOVER First z+self.opt.HOVER_FACTOR)
+        print("Brush cleaned")
 
     def get_paint(self, paint_index):
         if self.opt.simulate: return
